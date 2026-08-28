@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>SQANDAL — на домашний экран</title>
+  <meta name="description" content="Как добавить SQANDAL.net на главный экран iPhone и Android." />
+  <meta name="theme-color" content="#070707" />
+  <meta name="color-scheme" content="dark" />
+  <link rel="icon" href="https://sqandal.net/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #070707;
+      --fg: #fafafa;
+      --surface: #121212;
+      --muted: #8f8f8f;
+      --primary: #f51d31;
+      --primary-fg: #fafafa;
+      --border: #262626;
+      --popover: #0d0d0d;
+      --font: Inter, system-ui, sans-serif;
+      --display: "Bebas Neue", Inter, sans-serif;
+      --grotesk: "Space Grotesk", Inter, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); }
+    html { -webkit-text-size-adjust: 100%; }
+    button, a { touch-action: manipulation; }
+    button { font: inherit; cursor: pointer; }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    .wrap { max-width: 64rem; margin: 0 auto; padding: 0 0.75rem 7rem; }
+    @media (min-width: 640px) { .wrap { padding: 0 1.5rem 2.5rem; } }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .head {
+      max-width: 64rem; margin: 0 auto;
+      height: 3.5rem; padding: 0 0.75rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+    }
+    @media (min-width: 640px) { .head { height: 4rem; padding: 0 1.5rem; } }
+    .brand { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+    .brand img { width: 2.5rem; height: 2.5rem; object-fit: contain; }
+    @media (min-width: 640px) { .brand img { width: 3rem; height: 3rem; } }
+    .wordmark {
+      display: flex; width: 8rem; justify-content: space-between;
+      font-family: var(--display); font-size: 1.5rem; line-height: 1; letter-spacing: 0.04em;
+    }
+    @media (min-width: 640px) { .wordmark { width: 10rem; font-size: 2.25rem; } }
+    .tag {
+      margin-top: 0.125rem;
+      font-family: var(--grotesk); font-size: 0.625rem; font-weight: 500;
+      letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted);
+    }
+    .head-label { display: none; font-family: var(--grotesk); font-size: 0.625rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+    @media (min-width: 640px) { .head-label { display: inline; } }
+
+    .banner {
+      margin: 1rem 0 0;
+      background: var(--surface); padding: 0.625rem 0.75rem;
+      border-radius: 8px; box-shadow: inset 0 0 0 1px var(--primary);
+      font-size: 0.875rem; line-height: 1.35;
+    }
+    .hidden { display: none !important; }
+
+    .tabs {
+      margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr;
+      background: var(--surface); padding: 4px; border-radius: 8px;
+      box-shadow: inset 0 0 0 1px var(--border);
+    }
+    .tabs button {
+      height: 2.75rem; border: 0; border-radius: 4px; background: transparent;
+      font-family: var(--grotesk); font-size: 0.75rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .tabs button.on { background: var(--primary); color: var(--primary-fg); }
+
+    .cheat {
+      margin: 0.75rem 0 0; text-align: center;
+      font-family: var(--grotesk); font-size: 0.625rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .cheat .arr { margin: 0 0.4rem; color: var(--primary); }
+
+    .stage { margin-top: 1rem; display: flex; flex-direction: column; align-items: center; }
+
+    .phone-stage { width: min(16.25rem, 72vw, 36dvh); margin: 0 auto; }
+    @media (min-width: 640px) { .phone-stage { width: min(18.75rem, 42vw, 52dvh); } }
+    .bezel {
+      position: relative; overflow: hidden; border-radius: 36px;
+      background: var(--popover); padding: 6px;
+      box-shadow: 0 24px 64px -12px rgb(0 0 0 / 0.65), inset 0 0 0 1px var(--border);
+    }
+    @media (min-width: 640px) { .bezel { padding: 8px; } }
+    .screen { position: relative; overflow: hidden; border-radius: 28px; background: var(--bg); aspect-ratio: 390 / 760; }
+    .notch {
+      pointer-events: none; position: absolute; inset: 0 0 auto; z-index: 20;
+      display: flex; height: 1.75rem; justify-content: center; padding-top: 6px;
+    }
+    .notch span { width: 5rem; height: 1rem; border-radius: 999px; background: var(--bg); }
+
+    .scene { display: flex; flex-direction: column; height: 100%; }
+    .chrome { display: flex; align-items: center; justify-content: space-between; padding: 2rem 0.75rem 0.375rem; }
+    .chrome, .url, .tiny { font-family: var(--grotesk); font-size: 0.5625rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+    .url {
+      margin: 0 0.75rem 0.5rem; height: 1.75rem; display: flex; align-items: center; gap: 0.5rem;
+      padding: 0 0.625rem; border-radius: 999px; background: var(--surface);
+      box-shadow: inset 0 0 0 1px var(--border); letter-spacing: 0; text-transform: none; font-size: 0.625rem; color: var(--fg);
+    }
+    .site { padding: 0 0.75rem; }
+    .site-h { display: flex; align-items: center; gap: 0.5rem; }
+    .site-h img { width: 2rem; height: 2rem; object-fit: contain; }
+    .site-h strong { font-family: var(--display); font-size: 1.125rem; font-weight: 400; letter-spacing: 0.04em; line-height: 1; }
+    .kicker { margin-top: 0.75rem; display: flex; align-items: center; gap: 0.375rem; }
+    .kicker i { width: 4px; height: 4px; background: var(--primary); display: block; }
+    .kicker span { font-family: var(--grotesk); font-size: 0.5625rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--primary); }
+    .headline { margin-top: 0.375rem; font-family: var(--display); font-size: 1.25rem; letter-spacing: 0.04em; line-height: 1; }
+    .card { margin-top: 0.75rem; overflow: hidden; box-shadow: inset 0 0 0 1px var(--border); }
+    .card-img { aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: var(--surface); }
+    .card-img img { width: 2.5rem; height: 2.5rem; object-fit: contain; opacity: 0.8; }
+    .card-cap { border-top: 1px solid var(--border); padding: 0.375rem 0.5rem; }
+    .card-cap strong { display: block; font-family: var(--display); font-size: 0.875rem; font-weight: 400; letter-spacing: 0.04em; line-height: 1; }
+    .card-cap span { font-family: var(--grotesk); font-size: 0.5625rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+
+    .bar { margin-top: auto; display: flex; align-items: center; justify-content: space-around; padding: 0.5rem 0.5rem 0.75rem; }
+    .abar { justify-content: space-between; padding-left: 0.75rem; padding-right: 0.75rem; }
+    .glyph { width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; border-radius: 999px; color: var(--fg); }
+    .glyph.on { background: color-mix(in srgb, var(--primary) 15%, transparent); color: var(--primary); box-shadow: 0 0 0 2px var(--primary); animation: pulse 1.6s ease-out infinite; }
+    @keyframes pulse { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 28%, transparent); } }
+    @media (prefers-reduced-motion: reduce) { .glyph.on { animation: none; } }
+
+    .sheet {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 10;
+      border-radius: 20px 20px 0 0; background: color-mix(in srgb, var(--surface) 95%, transparent);
+      padding-top: 0.5rem; box-shadow: inset 0 0 0 1px var(--border);
+    }
+    .handle { width: 2rem; height: 4px; border-radius: 999px; background: var(--border); margin: 0 auto 0.5rem; }
+    .sheet-in { padding: 0 0.75rem 0.5rem; }
+    .sheet-site { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; padding: 0.375rem 0.5rem; border-radius: 4px; background: var(--bg); box-shadow: inset 0 0 0 1px var(--border); }
+    .sheet-site img { width: 1.5rem; height: 1.5rem; object-fit: contain; }
+    .sheet-site b { display: block; font-family: var(--grotesk); font-size: 0.625rem; font-weight: 500; }
+    .sheet-site span { font-size: 0.5625rem; color: var(--muted); }
+    .row { display: flex; align-items: center; justify-content: space-between; padding: 0.375rem 0.5rem; border-radius: 4px; font-family: var(--grotesk); font-size: 0.625rem; }
+    .row.on { background: var(--primary); color: var(--primary-fg); }
+
+    .dim { position: absolute; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; background: rgb(7 7 7 / 0.7); padding: 0 1rem; }
+    .dialog { width: 100%; border-radius: 12px; background: var(--surface); padding: 0.75rem; box-shadow: inset 0 0 0 1px var(--border); }
+    .dialog-h { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-family: var(--grotesk); font-size: 0.625rem; }
+    .dialog-h .mute { color: var(--muted); }
+    .dialog-h .go { color: var(--primary); }
+    .dialog-b { display: flex; align-items: center; gap: 0.5rem; }
+    .dialog-b .ic { width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: var(--bg); box-shadow: inset 0 0 0 1px var(--border); }
+    .dialog-b img { width: 2rem; height: 2rem; object-fit: contain; }
+    .dialog-b strong { font-family: var(--display); font-size: 1.125rem; font-weight: 400; letter-spacing: 0.04em; line-height: 1; }
+    .dialog-b span { font-family: var(--grotesk); font-size: 0.5625rem; color: var(--muted); }
+
+    .menu {
+      position: absolute; right: 0.5rem; top: 0.5rem; z-index: 10; width: 68%;
+      overflow: hidden; border-radius: 8px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--border);
+    }
+    .menu div { padding: 0.375rem 0.625rem; font-family: var(--grotesk); font-size: 0.625rem; }
+    .menu div.on { background: var(--primary); color: var(--primary-fg); }
+    .dim.end { align-items: flex-end; padding-bottom: 2.5rem; }
+    .add-label { font-family: var(--grotesk); font-size: 0.625rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+    .add-btn { margin-top: 0.75rem; display: flex; justify-content: flex-end; }
+    .add-btn span {
+      border-radius: 4px; background: var(--primary); color: var(--primary-fg);
+      padding: 0.25rem 0.625rem; font-family: var(--grotesk); font-size: 0.625rem; letter-spacing: 0.22em; text-transform: uppercase;
+    }
+
+    .home { display: flex; flex-direction: column; height: 100%; background: var(--bg); padding: 2.5rem 1rem 0; }
+    .apps { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem 0.75rem; }
+    .app { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+    .app .ic {
+      position: relative; width: 2.75rem; height: 2.75rem; display: flex; align-items: center; justify-content: center;
+      border-radius: 12px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--border);
+    }
+    .app.hi .ic { box-shadow: inset 0 0 0 2px var(--primary); }
+    .app img { width: 2.25rem; height: 2.25rem; object-fit: contain; }
+    .dot { width: 0.75rem; height: 0.75rem; border-radius: 2px; background: var(--border); }
+    .badge { position: absolute; right: -2px; top: -2px; width: 0.625rem; height: 0.625rem; border-radius: 999px; background: var(--primary); box-shadow: 0 0 0 2px var(--bg); }
+    .app span { font-family: var(--grotesk); font-size: 0.5625rem; color: var(--muted); }
+    .app.hi span { color: var(--fg); }
+
+    .controls { margin-top: 1rem; display: flex; align-items: center; justify-content: center; gap: 1.25rem; }
+    .arrow {
+      width: 3rem; height: 3rem; border-radius: 999px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--fg); display: flex; align-items: center; justify-content: center;
+    }
+    .arrow:hover { border-color: var(--primary); color: var(--primary); }
+    .arrow:active { background: var(--primary); color: var(--primary-fg); }
+    .count { min-width: 4rem; text-align: center; font-family: var(--grotesk); font-size: 0.75rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+    .plat { margin-top: 0.5rem; font-family: var(--grotesk); font-size: 0.625rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+
+    .dots { margin-top: 0.5rem; display: flex; gap: 0.375rem; }
+    .dots button { width: 0.625rem; height: 0.625rem; border: 0; border-radius: 999px; background: var(--border); padding: 0; }
+    .dots button.on { width: 1.5rem; background: var(--primary); }
+
+    .caption { margin-top: 1rem; max-width: 36rem; width: 100%; text-align: center; padding: 0 0.25rem; }
+    .caption h1 { margin: 0; font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: 0.04em; }
+    @media (min-width: 640px) { .caption h1 { font-size: 1.875rem; } }
+    .caption p { margin: 0.5rem 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+    @media (min-width: 640px) { .caption p { font-size: 1rem; } }
+
+    .steps { max-width: 36rem; width: 100%; margin: 2rem auto 0; display: grid; gap: 0.5rem; padding: 0; list-style: none; }
+    .steps button {
+      width: 100%; display: flex; gap: 1rem; text-align: left; padding: 1rem;
+      border-radius: 12px; border: 0; background: transparent; color: var(--fg);
+      box-shadow: inset 0 0 0 1px var(--border);
+    }
+    .steps button.on { background: var(--surface); box-shadow: inset 0 0 0 1px var(--primary); }
+    .num {
+      flex: 0 0 2rem; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;
+      border-radius: 4px; background: var(--surface); color: var(--muted);
+      font-family: var(--display); font-size: 1.125rem; line-height: 1;
+    }
+    .steps button.on .num { background: var(--primary); color: var(--primary-fg); }
+    .steps strong { display: block; font-family: var(--display); font-size: 1.25rem; font-weight: 400; letter-spacing: 0.04em; }
+    .steps span { display: block; margin-top: 0.25rem; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+
+    .notify {
+      max-width: 36rem; width: 100%; margin: 2.5rem auto 0;
+      background: var(--surface); border-radius: 12px; padding: 1.25rem 1.5rem;
+      box-shadow: inset 0 0 0 1px var(--border);
+    }
+    .notify .k { display: flex; align-items: center; gap: 0.5rem; font-family: var(--grotesk); font-size: 0.625rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--primary); }
+    .notify h2 { margin: 0.5rem 0 0; font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: 0.04em; }
+    .notify > p { margin: 0.75rem 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+    .notify ol { margin: 1.25rem 0 0; padding: 0; list-style: none; display: grid; gap: 0.75rem; }
+    .notify li { display: flex; gap: 0.75rem; font-size: 0.875rem; line-height: 1.5; }
+    .notify li i {
+      flex: 0 0 1.5rem; width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center;
+      border-radius: 4px; background: var(--bg); color: var(--primary);
+      font-family: var(--display); font-size: 1rem; font-style: normal; box-shadow: inset 0 0 0 1px var(--border);
+    }
+    .cta {
+      margin-top: 1.5rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      height: 3rem; padding: 0 1.25rem; border-radius: 8px; background: var(--primary); color: var(--primary-fg);
+      font-family: var(--grotesk); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase;
+      width: 100%;
+    }
+    @media (min-width: 640px) { .cta { width: auto; } }
+
+    .qr { display: none; margin-top: 2rem; align-items: center; justify-content: center; gap: 1rem; }
+    @media (min-width: 640px) { .qr { display: flex; } }
+    .qr img { width: 4rem; height: 4rem; background: var(--fg); padding: 4px; border-radius: 4px; }
+    .qr p { max-width: 20rem; margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+
+    footer { display: none; border-top: 1px solid var(--border); }
+    @media (min-width: 640px) { footer { display: block; } }
+    .foot { max-width: 64rem; margin: 0 auto; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; gap: 0.5rem; font-family: var(--grotesk); font-size: 0.625rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+    .foot a:hover { color: var(--primary); }
+
+    .dock {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+      border-top: 1px solid var(--border); background: rgb(7 7 7 / 0.9);
+      padding: 0.75rem 0.75rem max(0.75rem, env(safe-area-inset-bottom));
+      backdrop-filter: blur(12px);
+    }
+    @media (min-width: 640px) { .dock { display: none; } }
+    .dock a {
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      height: 3.5rem; border-radius: 8px; background: var(--primary); color: var(--primary-fg);
+      font-family: var(--grotesk); font-size: 0.875rem; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="head">
+      <a class="brand" href="https://sqandal.net" target="_blank" rel="noopener">
+        <img src="https://sqandal.net/__l5e/assets-v1/d9ab782b-6d6b-4dc8-85d9-64a0627492a5/sqandal-q-logo.png" alt="SQANDAL" />
+        <span>
+          <span class="wordmark" aria-label="SQANDAL"><span>S</span><span>Q</span><span>A</span><span>N</span><span>D</span><span>A</span><span>L</span></span>
+          <span class="tag">Hip-Hop Community</span>
+        </span>
+      </a>
+      <span class="head-label">Инструкция</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="inapp" class="banner hidden">
+      Откройте в <b id="inapp-browser">Safari</b>: нажмите <b>⋯</b> → «Открыть в браузере».
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Платформа">
+      <button type="button" id="tab-ios" class="on" role="tab" aria-selected="true">iPhone / iPad</button>
+      <button type="button" id="tab-android" role="tab" aria-selected="false">Android</button>
+    </div>
+    <p class="cheat" id="cheat"></p>
+
+    <section class="stage" aria-roledescription="carousel" aria-label="Шаги установки">
+      <div class="phone-stage" id="phone"></div>
+
+      <div class="controls">
+        <button type="button" class="arrow" id="prev" aria-label="Предыдущий шаг">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <p class="count" id="count">1 / 5</p>
+        <button type="button" class="arrow" id="next" aria-label="Следующий шаг">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <p class="plat" id="plat">iPhone · Safari</p>
+      <div class="dots" id="dots" role="tablist" aria-label="Шаги"></div>
+      <div class="caption">
+        <h1 id="title"></h1>
+        <p id="body"></p>
+      </div>
+    </section>
+
+    <ol class="steps" id="list"></ol>
+
+    <section class="notify">
+      <p class="k">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Уведомления
+      </p>
+      <h2>Включите уведомления — будут приходить</h2>
+      <p>Сообщения кабинета, ответы и новости приходят и на сайт, и на иконку SQANDAL на главном экране. Нужно один раз разрешить уведомления.</p>
+      <ol>
+        <li><i>1</i><span>Откройте SQANDAL с иконки на рабочем столе — не из Telegram.</span></li>
+        <li><i>2</i><span>Войдите в кабинет.</span></li>
+        <li><i>3</i><span>На запрос «Разрешить уведомления» нажмите «Разрешить». После этого они будут приходить на телефон и на сайт.</span></li>
+      </ol>
+      <a class="cta" href="https://sqandal.net/auth" target="_blank" rel="noopener">Войти и включить уведомления ↗</a>
+    </section>
+
+    <div class="qr">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https%3A%2F%2Fsqandal.net" alt="QR-код на sqandal.net" width="72" height="72" />
+      <p>С компьютера — наведите камеру на код и откройте sqandal.net на телефоне.</p>
+    </div>
+  </main>
+
+  <footer>
+    <div class="foot">
+      <p>sqandal.net · хип-хоп комьюнити</p>
+      <a href="https://sqandal.net">Перейти на сайт →</a>
+    </div>
+  </footer>
+
+  <div class="dock">
+    <a href="https://sqandal.net" target="_blank" rel="noopener">Открыть sqandal.net ↗</a>
+  </div>
+
+  <script>
+    const LOGO = "https://sqandal.net/__l5e/assets-v1/d9ab782b-6d6b-4dc8-85d9-64a0627492a5/sqandal-q-logo.png";
+
+    const IOS = [
+      { title: "Откройте сайт в Safari", body: "Ярлык ставится только из Safari. Если ссылка открылась в Telegram, Instagram или Chrome — нажмите «⋯» и выберите «Открыть в Safari»." },
+      { title: "Нажмите «Поделиться»", body: "Кнопка внизу экрана: квадрат со стрелкой вверх. На iPad она в верхней панели." },
+      { title: "На экран «Домой»", body: "Пролистайте список действий и нажмите «На экран «Домой»». Если пункта нет — «Изменить действия…» и включите его." },
+      { title: "Подтвердите «Добавить»", body: "Проверьте название SQANDAL и нажмите «Добавить» в правом верхнем углу." },
+      { title: "Готово", body: "Иконка SQANDAL появится на главном экране. Откройте её, войдите в кабинет — сообщения и уведомления те же, что на сайте." }
+    ];
+    const ANDROID = [
+      { title: "Откройте сайт в Chrome", body: "Если ссылка открылась внутри Telegram или Instagram — нажмите «⋯» и выберите «Открыть в Chrome»." },
+      { title: "Меню в правом верхнем углу", body: "Три точки ⋮ в углу окна Chrome." },
+      { title: "Добавить на главный экран", body: "В меню выберите «Добавить на главный экран» или «Установить приложение»." },
+      { title: "Подтвердите", body: "Нажмите «Добавить». На Samsung Internet путь тот же: меню → «Добавить страницу на» → «Главный экран»." },
+      { title: "Готово", body: "Ярлык SQANDAL окажется на рабочем столе. Откройте его, войдите в кабинет — сообщения и уведомления те же, что на сайте." }
+    ];
+
+    const ua = navigator.userAgent || "";
+    let platform = /Android/i.test(ua) ? "android" : "ios";
+    let step = 0;
+    const inApp = /Telegram|Instagram|FBAN|FBAV|VKAndroid|VKClient|Line\//i.test(ua);
+
+    const $ = (id) => document.getElementById(id);
+    const steps = () => platform === "ios" ? IOS : ANDROID;
+
+    function siteContent() {
+      return `
+        <div class="site">
+          <div class="site-h">
+            <img src="${LOGO}" alt="" />
+            <div>
+              <strong>SQANDAL</strong>
+              <div class="tag">Hip-Hop Community</div>
+            </div>
+          </div>
+          <div class="kicker"><i></i><span>scandals</span></div>
+          <div class="headline">Эксклюзивы.<br/>Релизы. Культура.</div>
+          <div class="card">
+            <div class="card-img"><img src="${LOGO}" alt="" /></div>
+            <div class="card-cap"><strong>Главный материал</strong><span>Читать →</span></div>
+          </div>
+        </div>`;
+    }
+
+    function chrome(name) {
+      return `
+        <div class="chrome"><span>${name}</span><span style="letter-spacing:0;text-transform:none">9:41</span></div>
+        <div class="url">
+          <svg width="8" height="10" viewBox="0 0 10 12" fill="none"><rect x="1.5" y="5" width="7" height="6" rx="1" stroke="currentColor" stroke-width="1.1"/><path d="M3 5V3.4a2 2 0 0 1 4 0V5" stroke="currentColor" stroke-width="1.1"/></svg>
+          sqandal.net
+        </div>`;
+    }
+
+    function home() {
+      const apps = ["Музыка","Фото","Почта","Чаты","SQANDAL","Новости"];
+      return `<div class="home"><div class="apps">${apps.map((n) => {
+        const sq = n === "SQANDAL";
+        return `<div class="app${sq ? " hi" : ""}">
+          <div class="ic">${sq ? `<img src="${LOGO}" alt="" /><span class="badge"></span>` : `<span class="dot"></span>`}</div>
+          <span>${n}</span>
+        </div>`;
+      }).join("")}</div></div>`;
+    }
+
+    function iosScene(s) {
+      if (s >= 4) return home();
+      const shareOn = s === 1 || s === 2;
+      const sheet = s === 2 ? `
+        <div class="sheet">
+          <div class="handle"></div>
+          <div class="sheet-in">
+            <div class="sheet-site"><img src="${LOGO}" alt="" /><div><b>SQANDAL.net</b><span>sqandal.net</span></div></div>
+            <div class="row">Копировать</div>
+            <div class="row on">На экран «Домой» <svg width="12" height="12" viewBox="0 0 12 12"><rect x="1" y="1" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M6 3.5v5M3.5 6h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+            <div class="row">В избранное</div>
+          </div>
+        </div>` : "";
+      const dialog = s === 3 ? `
+        <div class="dim">
+          <div class="dialog">
+            <div class="dialog-h"><span class="mute">Отменить</span><span class="go">Добавить</span></div>
+            <div class="dialog-b">
+              <div class="ic"><img src="${LOGO}" alt="" /></div>
+              <div><strong>SQANDAL</strong><span>sqandal.net</span></div>
+            </div>
+          </div>
+        </div>` : "";
+      return `<div class="scene">${chrome("Safari")}<div style="position:relative;flex:1;min-height:0">${siteContent()}${sheet}${dialog}</div>
+        <div class="bar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="color:var(--muted)"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="color:var(--muted);transform:rotate(180deg)"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span class="glyph${shareOn ? " on" : ""}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 16V4M8 8l4-4 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="color:var(--muted)"><path d="M6 4h12v16H8a2 2 0 0 1-2-2V4z" stroke="currentColor" stroke-width="1.6"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="color:var(--muted)"><rect x="5" y="7" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg>
+        </div></div>`;
+    }
+
+    function androidScene(s) {
+      if (s >= 4) return home();
+      const menuOn = s === 1 || s === 2;
+      const menu = (s === 1 || s === 2) && s !== 3 ? `
+        <div class="menu">
+          <div>Новая вкладка</div><div>Журнал</div>
+          <div class="on">Добавить на главный экран</div>
+          <div>Настройки</div>
+        </div>` : "";
+      const dialog = s === 3 ? `
+        <div class="dim end">
+          <div class="dialog">
+            <div class="add-label">Добавить на главный экран</div>
+            <div class="dialog-b" style="margin-top:.5rem"><img src="${LOGO}" alt="" style="width:2rem;height:2rem" /><strong>SQANDAL</strong></div>
+            <div class="add-btn"><span>Добавить</span></div>
+          </div>
+        </div>` : "";
+      return `<div class="scene">${chrome("Chrome")}<div style="position:relative;flex:1;min-height:0">${siteContent()}${menu}${dialog}</div>
+        <div class="bar abar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="color:var(--muted)"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span style="font-family:var(--grotesk);font-size:.5625rem;color:var(--muted)">Google</span>
+          <span class="glyph${menuOn ? " on" : ""}"><svg width="14" height="14" viewBox="0 0 16 16"><circle cx="8" cy="2.5" r="1.4" fill="currentColor"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="8" cy="13.5" r="1.4" fill="currentColor"/></svg></span>
+        </div></div>`;
+    }
+
+    function renderPhone() {
+      const inner = platform === "ios" ? iosScene(step) : androidScene(step);
+      $("phone").innerHTML = `<div class="bezel"><div class="screen"><div class="notch"><span></span></div>${inner}</div></div>`;
+    }
+
+    function render() {
+      const list = steps();
+      const cur = list[step];
+      $("count").textContent = (step + 1) + " / " + list.length;
+      $("plat").textContent = platform === "ios" ? "iPhone · Safari" : "Android · Chrome";
+      $("title").textContent = cur.title;
+      $("body").textContent = cur.body;
+      $("cheat").innerHTML = (platform === "ios"
+        ? ["Safari","Поделиться","На экран «Домой»","Добавить"]
+        : ["Chrome","Меню ⋮","На главный экран","Добавить"]
+      ).map((t,i) => (i ? '<span class="arr">→</span>' : "") + "<span style='color:var(--fg)'>" + t + "</span>").join("");
+      $("tab-ios").classList.toggle("on", platform === "ios");
+      $("tab-android").classList.toggle("on", platform === "android");
+      $("tab-ios").setAttribute("aria-selected", platform === "ios");
+      $("tab-android").setAttribute("aria-selected", platform === "android");
+      $("dots").innerHTML = list.map((item, i) => `<button type="button" class="${i===step?"on":""}" aria-label="Шаг ${i+1}: ${item.title}"></button>`).join("");
+      $("list").innerHTML = list.map((item, i) => `<li><button type="button" class="${i===step?"on":""}"><span class="num">${i+1}</span><span><strong>${item.title}</strong><span>${item.body}</span></span></button></li>`).join("");
+      renderPhone();
+    }
+
+    function go(d) {
+      const n = steps().length;
+      step = (step + d + n) % n;
+      render();
+    }
+    function goTo(i) { step = i; render(); }
+
+    $("prev").onclick = () => go(-1);
+    $("next").onclick = () => go(1);
+    $("tab-ios").onclick = () => { platform = "ios"; step = 0; render(); };
+    $("tab-android").onclick = () => { platform = "android"; step = 0; render(); };
+    $("dots").addEventListener("click", (e) => {
+      const btns = [...$("dots").querySelectorAll("button")];
+      const i = btns.indexOf(e.target.closest("button"));
+      if (i >= 0) goTo(i);
+    });
+    $("list").addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      const i = [...$("list").querySelectorAll("button")].indexOf(btn);
+      if (i >= 0) {
+        goTo(i);
+        $("phone").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+
+    let x0 = null, y0 = null;
+    $("phone").addEventListener("pointerdown", (e) => { x0 = e.clientX; y0 = e.clientY; });
+    $("phone").addEventListener("pointerup", (e) => {
+      if (x0 == null) return;
+      const dx = e.clientX - x0, dy = e.clientY - y0;
+      x0 = y0 = null;
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+      go(dx > 0 ? -1 : 1);
+    });
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") go(-1);
+      if (e.key === "ArrowRight") go(1);
+    });
+
+    if (inApp) {
+      $("inapp").classList.remove("hidden");
+      $("inapp-browser").textContent = platform === "ios" ? "Safari" : "Chrome";
+    }
+    render();
+  </script>
+</body>
+</html>
